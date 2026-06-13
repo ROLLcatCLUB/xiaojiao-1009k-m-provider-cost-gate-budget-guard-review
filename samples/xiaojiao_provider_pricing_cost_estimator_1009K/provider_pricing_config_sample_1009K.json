@@ -1,0 +1,15 @@
+{
+  "provider_name": "minimax",
+  "model_name": "sandbox_model_from_env_redacted",
+  "input_token_unit_price": null,
+  "output_token_unit_price": null,
+  "currency": "CNY",
+  "price_unit": "per_1k_tokens",
+  "pricing_source": null,
+  "pricing_verified": false,
+  "pricing_updated_at": null,
+  "pricing_missing_reason": "USER_PROVIDER_PRICING_REQUIRED",
+  "estimated_cost_cny": null,
+  "cost_gate_incomplete": true,
+  "next_cost_action": "USER_PROVIDER_PRICING_REQUIRED"
+}

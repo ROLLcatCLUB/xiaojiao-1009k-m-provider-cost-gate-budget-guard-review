@@ -1,0 +1,20 @@
+{
+  "source": "1008M token and latency records",
+  "sample_actions": [
+    {
+      "action": "generate_handout_candidate",
+      "input_tokens": 720,
+      "output_tokens": 600,
+      "estimated_cost_cny": null
+    },
+    {
+      "action": "shorten_second_activity_candidate",
+      "input_tokens": 620,
+      "output_tokens": 420,
+      "estimated_cost_cny": null
+    }
+  ],
+  "pricing_verified": false,
+  "cost_gate_incomplete": true,
+  "next_cost_action": "USER_PROVIDER_PRICING_REQUIRED"
+}

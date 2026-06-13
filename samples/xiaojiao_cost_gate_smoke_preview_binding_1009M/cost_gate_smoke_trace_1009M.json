@@ -1,0 +1,8 @@
+[
+  "preview_cost_status_visible",
+  "backend_provider_cost_event_supported",
+  "teacher_explicit_trigger_required",
+  "batch_generation_blocked",
+  "background_generation_blocked",
+  "default_route_auto_provider_call_blocked"
+]

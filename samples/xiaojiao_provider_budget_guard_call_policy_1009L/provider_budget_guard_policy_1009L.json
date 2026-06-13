@@ -1,0 +1,32 @@
+{
+  "allowed_actions": [
+    "generate_handout_candidate",
+    "shorten_second_activity_candidate"
+  ],
+  "per_action_token_budget": {
+    "generate_handout_candidate": {
+      "input_tokens": 1200,
+      "output_tokens": 1200
+    },
+    "shorten_second_activity_candidate": {
+      "input_tokens": 1000,
+      "output_tokens": 900
+    }
+  },
+  "per_action_latency_budget_ms": {
+    "generate_handout_candidate": 70000,
+    "shorten_second_activity_candidate": 70000
+  },
+  "per_action_cost_budget": {
+    "generate_handout_candidate": null,
+    "shorten_second_activity_candidate": null
+  },
+  "per_teacher_daily_budget": null,
+  "per_teacher_daily_call_limit": 10,
+  "batch_generation_allowed": false,
+  "background_generation_allowed": false,
+  "default_route_auto_provider_call_allowed": false,
+  "teacher_explicit_trigger_required": true,
+  "teacher_review_required": true,
+  "cost_gate_incomplete": true
+}

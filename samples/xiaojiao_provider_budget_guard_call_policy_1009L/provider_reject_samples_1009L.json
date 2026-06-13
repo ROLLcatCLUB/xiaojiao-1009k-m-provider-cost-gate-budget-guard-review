@@ -1,0 +1,8 @@
+[
+  "REJECT:action_not_allowlisted",
+  "REJECT:cost_gate_incomplete",
+  "REJECT:daily_budget_exceeded",
+  "REJECT:background_generation_not_allowed",
+  "REJECT:batch_generation_not_allowed",
+  "REJECT:default_route_auto_provider_call_not_allowed"
+]

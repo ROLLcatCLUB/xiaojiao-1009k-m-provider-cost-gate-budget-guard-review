@@ -1,0 +1,7 @@
+{
+  "action": "generate_handout_candidate",
+  "input_tokens": 720,
+  "output_tokens": 600,
+  "estimated_cost_cny": null,
+  "cost_gate_incomplete": true
+}

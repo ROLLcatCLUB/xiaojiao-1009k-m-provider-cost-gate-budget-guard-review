@@ -1,0 +1,1801 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>小教新工作面预览</title>
+  <style>
+    :root {
+      --paper: #fafaf9;
+      --panel: #ffffff;
+      --ink: #292524;
+      --muted: #57534e;
+      --line: #e7e5e4;
+      --soft: #f5f5f4;
+      --amber: #d97706;
+      --amber-soft: #fffbeb;
+      --teal: #0f766e;
+      --rose: #e11d48;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
+    .page { min-height: 100vh; padding: 26px 24px 132px; }
+    body.intent-open .page { padding-bottom: 260px; }
+    .center { min-height: calc(100vh - 138px); display: flex; align-items: center; justify-content: center; }
+    .wrap { width: min(760px, 100%); margin: 0 auto; }
+    .top { max-width: 900px; margin: 0 auto 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .crumb { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; }
+    .back { border: 0; background: transparent; color: var(--muted); padding: 8px 12px; border-radius: 999px; }
+    .back:hover { background: var(--soft); color: var(--ink); }
+    .mark {
+      width: 38px; height: 38px; border-radius: 16px;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 14px; font-weight: 700;
+      background: linear-gradient(135deg, #f59e0b, #fb923c 48%, #f43f5e);
+      box-shadow: 0 6px 16px rgba(217,119,6,.22);
+      flex: 0 0 auto;
+    }
+    .mark.small { width: 30px; height: 30px; border-radius: 13px; font-size: 12px; }
+    .mark.tiny { width: 24px; height: 24px; border-radius: 10px; font-size: 11px; }
+    .thinking-mark { animation: pulse 1.2s infinite; }
+    @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(.96); opacity: .72; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 28px; line-height: 1.35; font-weight: 560; letter-spacing: 0; }
+    h2 { font-size: 22px; line-height: 1.35; font-weight: 560; }
+    h3 { font-size: 16px; line-height: 1.45; font-weight: 560; }
+    p, li { line-height: 1.65; }
+    .muted { color: var(--muted); }
+    .card {
+      background: var(--panel);
+      border: 1px solid #f5f5f4;
+      border-radius: 28px;
+      box-shadow: 0 10px 30px rgba(41, 37, 36, .035);
+      padding: 26px;
+    }
+    .card.lead {
+      border-color: #fde68a;
+      border-left: 4px solid var(--amber);
+      box-shadow: 0 16px 38px rgba(217,119,6,.10);
+    }
+    .panel {
+      background: var(--soft);
+      border: 0;
+      box-shadow: none;
+      border-radius: 18px;
+      padding: 20px;
+    }
+    .tag { display: inline-flex; align-items: center; border-radius: 999px; padding: 5px 10px; background: var(--amber-soft); color: #b45309; font-size: 12px; }
+    .tag.ok { background: #ecfdf5; color: var(--teal); }
+    .tag.gray { background: var(--soft); color: var(--muted); }
+    .btns { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 24px; }
+    .btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #44403c;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 520;
+      transition: .18s ease;
+    }
+    .btn:hover { border-color: #d6d3d1; background: #fafaf9; }
+    .btn:focus-visible, input:focus-visible, .choice:focus-visible, .back:focus-visible {
+      outline: 3px solid rgba(217,119,6,.28);
+      outline-offset: 2px;
+    }
+    .btn.primary { background: var(--amber); border-color: var(--amber); color: #fff; box-shadow: 0 6px 14px rgba(217,119,6,.16); }
+    .btn.primary:hover { background: #b45309; }
+    .btn.ghost { border-color: transparent; background: transparent; color: var(--muted); }
+    .btn.danger { border-color: transparent; background: transparent; color: #a8a29e; }
+    .btn.danger:hover { color: var(--rose); background: #fff1f2; }
+    .says { display: flex; align-items: flex-start; gap: 12px; margin-top: 20px; }
+    .bubble {
+      background: var(--amber-soft);
+      border: 1px solid #fde68a;
+      border-radius: 18px;
+      border-top-left-radius: 4px;
+      padding: 14px 16px;
+      color: #57534e;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+    .bubble-label { color: #b45309; font-size: 12px; font-weight: 600; margin-bottom: 3px; opacity: .86; }
+    .entry-card { max-width: 590px; margin: 0 auto; }
+    .entry-meta { display: flex; align-items: center; gap: 8px; margin: 18px 0; flex-wrap: wrap; }
+    .lesson-shell { max-width: 900px; margin: 0 auto; }
+    .goal-list { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 14px; color: #44403c; }
+    .goal-list li { display: flex; gap: 8px; }
+    .goal-list li::before { content: "·"; color: #f59e0b; font-weight: 700; }
+    .timeline-bar { display: flex; gap: 0; height: 10px; overflow: hidden; border-radius: 999px; margin: 16px 0 8px; background: #f5f5f4; border: 1px solid #edeae7; }
+    .timeline-bar span { background: #ddd6d1; border-right: 2px solid #fafaf9; position: relative; }
+    .timeline-bar span:last-child { border-right: 0; }
+    .timeline-bar .hot { background: #fbbf24; }
+    .timeline-bar .done { background: #99f6e4; }
+    .time-labels { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .time-labels span { font-size: 12px; color: var(--muted); background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; }
+    .segment { border-radius: 14px; padding: 13px 16px; background: var(--soft); display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; }
+    .segment.hot { background: var(--amber-soft); border: 1px solid #fde68a; }
+    .segment.done { background: #f0fdfa; border: 1px solid #ccfbf1; }
+    .attached-note { margin: 10px 0 0 22px; padding-left: 16px; border-left: 2px solid #fde68a; }
+    .related { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
+    .related-card { border: 1px solid #f5f5f4; background: #fff; border-radius: 18px; padding: 14px; }
+    .related-card.active { border-color: #fde68a; }
+    .related-card.disabled { background: #f7f5f2; color: #8f8780; opacity: .72; cursor: default; }
+    .choice-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin: 8px 0 18px; }
+    .choice { border: 1px solid var(--line); background: #fff; border-radius: 14px; padding: 11px 8px; color: #57534e; font-size: 14px; }
+    .choice.active { background: var(--amber-soft); border-color: #fcd34d; color: #92400e; }
+    .overlay { position: fixed; inset: 0; z-index: 42; background: rgba(41,37,36,.24); display: flex; align-items: center; justify-content: center; padding: 18px; }
+    .modal { width: min(450px, 100%); background: #fff; border-radius: 28px; padding: 24px; box-shadow: 0 24px 60px rgba(41,37,36,.18); }
+    .worksheet { text-align: center; padding: 30px; }
+    .dashed { border-top: 1px dashed var(--line); margin: 22px 0; }
+    .task { display: flex; gap: 12px; align-items: flex-start; text-align: left; margin-top: 12px; font-size: 14px; }
+    .task b { color: var(--amber); flex: 0 0 auto; }
+    .source-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+    .source-tags span { border: 1px solid var(--line); background: #fff; color: var(--muted); padding: 5px 9px; border-radius: 999px; font-size: 12px; }
+    .hint {
+      text-align: left;
+      border-left: 3px solid var(--amber);
+      background: var(--amber-soft);
+      border-radius: 14px;
+      padding: 12px 14px;
+      color: #78350f;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+    .review-box { background: #fff; border: 1px solid #f5f5f4; border-radius: 28px; padding: 24px; box-shadow: 0 10px 30px rgba(41,37,36,.04); }
+    .record-options { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+    .record-options button.active { background: #f0fdfa; border-color: #5eead4; color: #0f766e; }
+    .intent-scrim { position: fixed; inset: 0; background: rgba(41,37,36,.08); z-index: 45; opacity: 0; pointer-events: none; transition: opacity .18s ease; }
+    body.intent-open .intent-scrim { opacity: 1; pointer-events: auto; }
+    .intent-wrap { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: flex; justify-content: center; padding: 0 16px 16px; pointer-events: none; }
+    .intent-inner { width: min(680px, 100%); pointer-events: auto; }
+    .intent-pop { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 12px; animation: fadeIn .24s ease; }
+    .intent-card { max-width: 500px; background: #fff; border: 1px solid #fde68a; border-radius: 20px; border-bottom-left-radius: 5px; box-shadow: 0 16px 42px rgba(41,37,36,.13); padding: 14px 16px; }
+    .dots { display: inline-flex; gap: 4px; margin-left: 8px; vertical-align: middle; }
+    .dots span { width: 6px; height: 6px; border-radius: 999px; background: #fbbf24; animation: bounce .9s infinite; }
+    .dots span:nth-child(2) { animation-delay: .14s; }
+    .dots span:nth-child(3) { animation-delay: .28s; }
+    @keyframes bounce { 0%,80%,100%{ transform: translateY(0); } 40%{ transform: translateY(-5px); } }
+    .done-pop { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; animation: fadeIn .24s ease; }
+    .done-icon { width: 32px; height: 32px; border-radius: 14px; background: #f0fdfa; color: var(--teal); display: flex; align-items: center; justify-content: center; }
+    .done-text { background: #fff; border: 1px solid #ccfbf1; border-radius: 18px; box-shadow: 0 8px 20px rgba(15,118,110,.08); padding: 10px 14px; color: var(--teal); font-size: 14px; }
+    .intent-collapsed, .intent-open {
+      width: 100%;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 30px rgba(41,37,36,.10);
+    }
+    .intent-collapsed { border-radius: 999px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; color: #a8a29e; }
+    .intent-collapsed span:first-child { display: flex; align-items: center; gap: 9px; }
+    .intent-open { border-radius: 26px; padding: 12px; }
+    .intent-top { display: flex; justify-content: space-between; align-items: center; padding: 0 8px 9px; color: #a8a29e; font-size: 12px; }
+    .intent-line { display: flex; align-items: center; gap: 8px; }
+    .intent-line input { flex: 1; border: 0; outline: none; background: var(--soft); border-radius: 18px; padding: 13px 15px; color: #44403c; }
+    .send { width: 44px; height: 44px; border: 0; border-radius: 18px; background: var(--amber); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+    .quick { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 4px 0; }
+    .quick button { border: 1px solid var(--line); background: var(--soft); color: var(--muted); border-radius: 999px; padding: 6px 10px; font-size: 12px; }
+    [data-state-name]::after { content: attr(data-state-name); display: none; }
+    .style-switcher {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      z-index: 70;
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.86);
+      box-shadow: 0 10px 28px rgba(41,37,36,.08);
+      backdrop-filter: blur(12px);
+    }
+    .style-switcher button {
+      border: 0;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .style-switcher button.active {
+      background: var(--amber);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(217,119,6,.16);
+    }
+    body[data-theme="calm"] {
+      --paper: #f6f8f8;
+      --panel: #ffffff;
+      --ink: #203033;
+      --muted: #52666b;
+      --line: #d9e4e6;
+      --soft: #edf3f4;
+      --amber: #2f7f88;
+      --amber-soft: #edf8f9;
+      --teal: #21745f;
+      --rose: #b83d52;
+    }
+    body[data-theme="calm"] .mark {
+      background: linear-gradient(135deg, #2f7f88, #5fa7a2 54%, #8fbf88);
+      box-shadow: 0 6px 16px rgba(47,127,136,.18);
+    }
+    body[data-theme="calm"] .card.lead {
+      border-color: #bcdcdf;
+      border-left-color: var(--amber);
+      box-shadow: 0 16px 38px rgba(47,127,136,.09);
+    }
+    body[data-theme="calm"] .tag,
+    body[data-theme="calm"] .bubble,
+    body[data-theme="calm"] .hint,
+    body[data-theme="calm"] .segment.hot {
+      border-color: #bcdcdf;
+      color: #225e65;
+    }
+    body[data-theme="calm"] .bubble-label,
+    body[data-theme="calm"] .task b {
+      color: #2f7f88;
+    }
+    body[data-theme="calm"] .timeline-bar .hot,
+    body[data-theme="calm"] .dots span {
+      background: #5fa7a2;
+    }
+    body[data-theme="compact"] {
+      --paper: #f4f5f5;
+      --panel: #ffffff;
+      --ink: #202326;
+      --muted: #555f66;
+      --line: #d7dce0;
+      --soft: #eceff1;
+      --amber: #4b6272;
+      --amber-soft: #eef1f3;
+      --teal: #2b6f58;
+      --rose: #9f3d4c;
+    }
+    body[data-theme="compact"] .page { padding-top: 20px; }
+    body[data-theme="compact"] .card,
+    body[data-theme="compact"] .review-box {
+      border-radius: 16px;
+      box-shadow: none;
+      border-color: #dfe3e6;
+    }
+    body[data-theme="compact"] .card.lead {
+      border-left-color: var(--amber);
+      box-shadow: 0 8px 20px rgba(32,35,38,.06);
+    }
+    body[data-theme="compact"] .panel,
+    body[data-theme="compact"] .related-card,
+    body[data-theme="compact"] .segment,
+    body[data-theme="compact"] .modal,
+    body[data-theme="compact"] .intent-open,
+    body[data-theme="compact"] .intent-card {
+      border-radius: 12px;
+    }
+    body[data-theme="compact"] .mark {
+      border-radius: 10px;
+      background: linear-gradient(135deg, #485563, #66717b);
+      box-shadow: none;
+    }
+    body[data-theme="compact"] h1 { font-size: 25px; }
+    body[data-theme="compact"] .btn { border-radius: 10px; padding: 9px 14px; }
+    body[data-theme="compact"] .intent-collapsed { border-radius: 14px; }
+    body[data-theme="compact"] .tag,
+    body[data-theme="compact"] .bubble,
+    body[data-theme="compact"] .hint,
+    body[data-theme="compact"] .segment.hot {
+      border-color: #cfd6da;
+      color: #40515d;
+    }
+    body[data-theme="compact"] .bubble-label,
+    body[data-theme="compact"] .task b {
+      color: #4b6272;
+    }
+    @media (max-width: 760px) {
+      .page { padding: 18px 14px 112px; }
+      body.intent-open .page { padding-bottom: 280px; }
+      .related, .choice-grid { grid-template-columns: 1fr; }
+      .top { margin-bottom: 18px; }
+      h1 { font-size: 24px; }
+      .style-switcher { left: 50%; right: auto; transform: translateX(-50%); top: 8px; }
+      .top { padding-top: 36px; }
+    }
+  
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      color: #7c5a2b;
+      margin-bottom: 8px;
+    }
+    .today-priority {
+      position: relative;
+      overflow: hidden;
+    }
+    .today-priority::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 5px;
+      background: linear-gradient(#f59e0b, #fb923c);
+    }
+    .today-footnote {
+      color: #78716c;
+      font-size: 12px;
+      text-align: center;
+      margin-top: 26px;
+    }
+    .lesson-paper {
+      background: linear-gradient(#fff, #fffdf8);
+      border: 1px solid #f4e7cd;
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 12px 34px rgba(120, 80, 30, .05);
+    }
+    .step-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 18px 0 0;
+      padding: 10px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid #eee7dc;
+    }
+    .step-strip .tag { background: #fff; }
+    .folder-title {
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: #78716c;
+      font-size: 12px;
+    }
+    .related-card {
+      box-shadow: none;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .related-card.active {
+      background: #fffdf7;
+      transform: translateY(-1px);
+    }
+    .review-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 11px;
+      background: #fff7ed;
+      color: #9a3412;
+      border: 1px solid #fed7aa;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .worksheet {
+      border-color: #f1dfbc;
+      box-shadow: 0 18px 48px rgba(120,80,30,.09);
+    }
+    .worksheet .panel {
+      background: #faf7f0;
+      border: 1px solid #efe2c8;
+    }
+    .candidate-actions {
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .candidate-actions-main,
+    .candidate-actions-secondary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .candidate-actions-secondary .btn {
+      padding: 8px 13px;
+      font-size: 13px;
+    }
+    .review-box.lead-review {
+      border-color: #f6d99d;
+      box-shadow: 0 18px 46px rgba(120,80,30,.08);
+    }
+    .record-options button {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+    .modal-intro {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 18px;
+      padding: 12px 14px;
+      color: #6b4c21;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+    body[data-theme="calm"] .section-label { color: #2f7f88; }
+    body[data-theme="calm"] .lesson-paper {
+      background: linear-gradient(#fff, #f7fbfb);
+      border-color: #cfe4e6;
+    }
+    body[data-theme="calm"] .review-chip,
+    body[data-theme="calm"] .modal-intro {
+      background: #edf8f9;
+      border-color: #bcdcdf;
+      color: #225e65;
+    }
+    body[data-theme="compact"] .lesson-paper,
+    body[data-theme="compact"] .step-strip {
+      border-radius: 14px;
+      box-shadow: none;
+    }
+    @media (max-width: 760px) {
+      .candidate-actions { justify-content: flex-start; }
+      .candidate-actions-main, .candidate-actions-secondary { width: 100%; }
+      .candidate-actions-main .btn.primary { width: 100%; }
+    }
+
+  
+    .card { border-color: #f1efeb; box-shadow: 0 8px 22px rgba(41,37,36,.025); }
+    .card.lead { box-shadow: 0 12px 30px rgba(120,80,30,.06); }
+    .tag { background: #f5f5f4; color: #78716c; }
+    .tag.ok { background: #f0fdfa; color: var(--teal); }
+    .bubble {
+      background: #fffdf7;
+      border-color: #efe3c7;
+      color: #57534e;
+      line-height: 1.6;
+    }
+    .bubble-label { color: #8a6a38; }
+    .says .mark.small { opacity: .86; }
+    .btn.primary { box-shadow: 0 5px 12px rgba(217,119,6,.10); }
+    .lesson-paper { padding: 18px 20px; box-shadow: none; }
+    .goal-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 12px; }
+    .attached-note { border-left-color: #eadcc1; }
+    .attached-note .bubble { font-size: 13px; padding: 11px 13px; }
+    .time-labels span { background: transparent; }
+    .today-footnote { display: none; }
+    .modal { padding: 22px; }
+    .modal-intro {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      margin: -4px 0 16px;
+      color: #78716c;
+    }
+    .review-chip {
+      background: #f5f5f4;
+      color: #78716c;
+      border-color: #e7e5e4;
+      font-weight: 500;
+    }
+    .source-tags {
+      color: #78716c;
+      font-size: 12px;
+      margin-top: 12px;
+    }
+    .source-tags span {
+      border: 0;
+      background: transparent;
+      padding: 0;
+    }
+    .worksheet { box-shadow: 0 14px 36px rgba(120,80,30,.065); }
+    .review-box.lead-review { box-shadow: 0 12px 34px rgba(120,80,30,.055); }
+    .record-options { gap: 8px; }
+    .done-text { box-shadow: none; }
+    .intent-card { box-shadow: 0 10px 28px rgba(41,37,36,.09); }
+    .quick button:nth-child(3) { display: none; }
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      color: #7c5a2b;
+      margin-bottom: 8px;
+    }
+    .today-priority {
+      position: relative;
+      overflow: hidden;
+    }
+    .today-priority::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 5px;
+      background: linear-gradient(#f59e0b, #fb923c);
+    }
+    .today-footnote {
+      color: #78716c;
+      font-size: 12px;
+      text-align: center;
+      margin-top: 26px;
+    }
+    .lesson-paper {
+      background: linear-gradient(#fff, #fffdf8);
+      border: 1px solid #f4e7cd;
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 12px 34px rgba(120, 80, 30, .05);
+    }
+    .step-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 18px 0 0;
+      padding: 10px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid #eee7dc;
+    }
+    .step-strip .tag { background: #fff; }
+    .folder-title {
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: #78716c;
+      font-size: 12px;
+    }
+    .related-card {
+      box-shadow: none;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+    .related-card.active {
+      background: #fffdf7;
+      transform: translateY(-1px);
+    }
+    .review-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 11px;
+      background: #fff7ed;
+      color: #9a3412;
+      border: 1px solid #fed7aa;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .worksheet {
+      border-color: #f1dfbc;
+      box-shadow: 0 18px 48px rgba(120,80,30,.09);
+    }
+    .worksheet .panel {
+      background: #faf7f0;
+      border: 1px solid #efe2c8;
+    }
+    .candidate-actions {
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .candidate-actions-main,
+    .candidate-actions-secondary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .candidate-actions-secondary .btn {
+      padding: 8px 13px;
+      font-size: 13px;
+    }
+    .review-box.lead-review {
+      border-color: #f6d99d;
+      box-shadow: 0 18px 46px rgba(120,80,30,.08);
+    }
+    .record-options button {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+    .modal-intro {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 18px;
+      padding: 12px 14px;
+      color: #6b4c21;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+    body[data-theme="calm"] .section-label { color: #2f7f88; }
+    body[data-theme="calm"] .lesson-paper {
+      background: linear-gradient(#fff, #f7fbfb);
+      border-color: #cfe4e6;
+    }
+    body[data-theme="calm"] .review-chip,
+    body[data-theme="calm"] .modal-intro {
+      background: #edf8f9;
+      border-color: #bcdcdf;
+      color: #225e65;
+    }
+    body[data-theme="compact"] .lesson-paper,
+    body[data-theme="compact"] .step-strip {
+      border-radius: 14px;
+      box-shadow: none;
+    }
+    @media (max-width: 760px) {
+      .candidate-actions { justify-content: flex-start; }
+      .candidate-actions-main, .candidate-actions-secondary { width: 100%; }
+      .candidate-actions-main .btn.primary { width: 100%; }
+    }
+
+  
+    .preview-route-banner {
+      position: fixed;
+      left: 14px;
+      top: 14px;
+      z-index: 72;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.88);
+      color: var(--muted);
+      font-size: 12px;
+      box-shadow: 0 8px 22px rgba(41,37,36,.06);
+      backdrop-filter: blur(12px);
+    }
+    .preview-route-banner a { color: var(--muted); text-decoration: none; }
+    @media (max-width: 760px) { .preview-route-banner { top: 48px; } }
+
+  </style>
+</head>
+<body data-theme="minimax" data-preview-route="xiaojiao-preview" data-default-route="unchanged" data-source-baseline="1007O_R1" data-render-directive-preview="1010I">
+  <div class="preview-route-banner" aria-label="小教预览入口"><span>小教预览</span><span>非默认入口</span><span id="storeModeBadge">local fallback</span><span id="costGateBadge">成本待配置</span><a href="home.html">返回首页</a></div>
+
+  <div class="style-switcher" aria-label="风格切换">
+    <button type="button" data-theme-button="minimax" class="active" onclick="setTheme('minimax')">暖感</button>
+    <button type="button" data-theme-button="calm" onclick="setTheme('calm')">清爽</button>
+    <button type="button" data-theme-button="compact" onclick="setTheme('compact')">紧凑</button>
+  </div>
+  <main id="app">
+    <section id="entry" class="page" data-state-name="light_entry semantic_confirmation handout_candidate_preview teacher_review_gate">
+      <div class="top">
+        <div class="crumb"><span class="mark">教</span><strong>小教</strong></div>
+        <div class="muted">第 3 周 · 周三</div>
+      </div>
+      <div class="center">
+        <div class="entry-card">
+          <p class="muted" style="font-size:14px;margin-bottom:8px;">下午好，张老师</p>
+          <h1>今天 3 节课，1 项待你确认</h1>
+          <p class="muted" style="font-size:14px;margin-top:8px;">先看这一件。</p>
+          <div id="entryLeadCard" class="card lead today-priority" style="margin-top:30px;">
+            <div class="entry-meta">
+              <span class="tag">今日重点</span>
+              <span class="muted" style="font-size:13px;">课时设计草稿 · 待确认</span>
+            </div>
+            <h2>四年级 1 班《色彩的感觉》</h2>
+            <p class="muted" style="font-size:14px;margin-top:4px;">第 2 课 · 今天第 3 节</p>
+            <div class="says">
+              <span class="mark small">教</span>
+              <div class="bubble"><div class="bubble-label">小教建议</div>四年级第2课草稿好了，第二环节可能偏长。</div>
+            </div>
+            <div id="entryActions" class="btns">
+              <button class="btn primary" onclick="go('focus')">现在处理</button>
+              <button class="btn ghost" onclick="deferToday()">稍后</button>
+            </div>
+            <p id="deferReply" class="muted hidden" style="font-size:12px;margin-top:16px;">好，稍后再提醒你。</p>
+          </div>
+          <p class="today-footnote">先处理这一件，剩下的我帮你盯着。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="focus" class="page hidden">
+      <div class="lesson-shell">
+        <div class="top">
+          <div class="crumb"><span class="mark small">教</span><span>今日重点 › 这节课</span></div>
+          <button class="back" onclick="go('entry')">← 返回</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <span id="draftTag" class="tag">课时设计草稿 · 待确认</span>
+          <span class="muted" style="font-size:12px;">四年级 1 班 · 今天第 3 节</span>
+          <span id="redesignTag" class="tag ok hidden">已按你的话重排为新草稿</span>
+        </div>
+        <h1>《色彩的感觉》</h1>
+        <p class="muted" style="font-size:14px;margin-top:5px;">全课 40 分钟 · 共四个环节</p>
+
+          <div class="lesson-paper" style="margin-top:24px;">
+          <div class="section-label">教学目标</div>
+          <ul class="goal-list">
+            <li>感受冷色与暖色带来的不同情绪</li>
+            <li>能说出生活中常见的冷暖色</li>
+            <li>尝试用冷暖对比做一次简单的色彩表达</li>
+          </ul>
+        </div>
+
+        <div class="lesson-paper" style="margin-top:14px;">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;">
+            <div class="section-label" style="margin-bottom:0;">课时结构</div>
+            <div class="muted" style="font-size:12px;">共 40 分钟</div>
+          </div>
+          <div class="timeline-bar" id="timebar"></div>
+          <div class="time-labels" id="timeLabels"></div>
+          <div id="segments"></div>
+        </div>
+
+        <div style="margin-top:22px;">
+          <div class="folder-title"><span>本课材料</span><span>需要时打开</span></div>
+          <div class="related">
+            <div id="handoutCard" class="related-card"><strong>学习单</strong><p id="handoutStatus" class="muted" style="font-size:12px;margin-top:5px;">未生成</p></div>
+            <div class="related-card disabled" aria-disabled="true"><strong>评价量规</strong><p class="muted" style="font-size:12px;margin-top:5px;">本轮先不处理</p></div>
+            <div class="related-card disabled" aria-disabled="true"><strong>资源参考</strong><p class="muted" style="font-size:12px;margin-top:5px;">资源选择器未接入</p></div>
+          </div>
+        </div>
+        <div class="time-labels" style="margin-top:20px;">
+          <span id="stepDraft">1 草稿确认</span>
+          <span id="stepHandout">2 学习单候选</span>
+          <span id="stepReview">3 教师审核</span>
+        </div>
+
+        <div class="btns">
+          <button class="btn primary" onclick="go('semantic')">生成学习单候选</button>
+          <button id="confirmDraftBtn" class="btn" onclick="confirmDraft()">确认课时草稿</button>
+        </div>
+        <p id="progressText" class="muted" style="font-size:12px;margin-top:28px;">已看草稿</p>
+      </div>
+    </section>
+
+    <section id="semantic" class="overlay hidden" onclick="go('focus')">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:20px;">
+          <span class="mark small">教</span>
+          <div>
+            <div class="bubble-label">生成前，先确认一下</div>
+            <h2>学习单偏向哪种？</h2>
+          </div>
+        </div>
+        <div class="modal-intro">选个方向，我出一版候选。</div><div class="section-label">用途</div>
+        <div class="choice-grid" id="purposeChoices"></div>
+        <div class="section-label">难度</div>
+        <div class="choice-grid" id="difficultyChoices"></div>
+        <div class="btns" style="justify-content:flex-end;margin-top:22px;">
+          <button class="btn ghost" onclick="go('focus')">取消</button>
+          <button class="btn primary" onclick="makeCandidate()">出一版候选</button>
+        </div>
+        <p class="muted" style="font-size:12px;text-align:center;margin-top:16px;"></p>
+      </div>
+    </section>
+
+    <section id="candidate" class="page hidden">
+      <div class="wrap">
+        <div class="top">
+          <div class="crumb"><span class="mark small">教</span><span>今日重点 › 这节课 › 学习单候选</span></div>
+          <button class="back" onclick="go('focus')">← 返回</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span class="review-chip">小教候选稿</span>
+          <span id="candidateSourceChip" class="tag gray">live sandbox provider candidate</span>
+          <span class="muted" style="font-size:12px;">等你确认，不是正式材料</span>
+        </div>
+        <article class="card lead worksheet">
+          <h2>《色彩的感觉》学习单</h2>
+          <p class="muted" style="font-size:14px;margin-top:6px;">学习目标：感受冷暖色带来的不同情绪</p>
+          <div class="dashed"></div>
+          <div id="demoBlock" class="hint hidden">示范：老师先指着一张照片说“蓝色让我觉得安静”，再请你试试。</div>
+          <div class="task"><b>任务一</b><span id="task1">圈出图片中的冷色和暖色</span></div>
+          <div class="task"><b>任务二</b><span id="task2">用 3 个词描述这张图给你的感觉</span></div>
+          <div class="task"><b>任务三</b><span>用冷暖对比完成一张小色稿</span></div>
+          <div class="panel" style="margin-top:22px;text-align:left;"><div class="muted" style="font-size:12px;">自查问题</div><p style="font-size:14px;">我有没有说清楚颜色给我的感受？</p></div>
+          <p class="muted" style="font-size:12px;text-align:left;margin-top:14px;">难度：<span id="candidateDifficulty">正常</span></p>
+        </article>
+        <p class="source-tags" id="sourceTags"></p>
+        <p id="candidateFlash" class="tag ok hidden" style="margin-top:16px;"></p>
+        <div class="btns candidate-actions">
+          <div class="candidate-actions-main"><button class="btn primary" onclick="go('gate')">进入确认</button><button class="btn" onclick="flashCandidate('这份候选可先按你的想法再改。')">修改一下</button><button class="btn" onclick="flashCandidate('已暂存，今天稍后可以接着弄。')">暂存</button></div>
+          <div class="candidate-actions-secondary"><button class="btn ghost" onclick="flashCandidate('好，重新出一版。')">重新出一版</button><button class="btn danger" onclick="state.handout='未生成';renderFocus();go('focus')">放弃</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gate" class="page hidden">
+      <div class="wrap">
+        <div class="top">
+          <div class="crumb"><span class="mark small">教</span><span>今日重点 › 这节课 › 等你确认</span></div>
+          <button class="back" onclick="go('candidate')">← 返回</button>
+        </div>
+        <div id="reviewOpen" class="review-box lead-review">
+          <div style="display:flex;gap:13px;align-items:flex-start;">
+            <div class="done-icon" style="background:var(--amber-soft);color:var(--amber);">✓</div>
+            <div><h2>确认后，才放入本课</h2><p class="muted" style="font-size:14px;margin-top:4px;">你确认后，它才成为本课材料。</p></div>
+          </div>
+          <div class="panel" style="margin-top:18px;font-size:14px;">四年级《色彩的感觉》学习单 · 等待确认</div>
+          <div class="says">
+            <span class="mark small">教</span>
+            <div class="bubble">我整理好了。你确认后，它才成为本课材料。</div>
+          </div>
+          <div class="btns">
+            <button class="btn primary" onclick="setFinal('adopted')">确认采用</button>
+            <button class="btn" onclick="setFinal('adopted_edit')">修改后采用</button>
+            <button class="btn" onclick="setFinal('saved')">暂存</button>
+            <button class="btn danger" onclick="setFinal('dropped')">放弃</button>
+          </div>
+        </div>
+        <div id="reviewDone" class="review-box hidden">
+          <div style="display:flex;gap:13px;align-items:flex-start;">
+            <div class="done-icon">✓</div>
+            <div><h2 id="finalTitle">已暂存</h2><p id="finalText" class="muted" style="font-size:14px;margin-top:4px;"></p></div>
+          </div>
+          <div class="btns"><button class="btn" onclick="go('focus')">回到这节课</button><button class="btn ghost" onclick="go('entry')">回到今日重点</button></div>
+        </div>
+        <div class="review-box" style="margin-top:16px;">
+          <div style="display:flex;align-items:center;gap:10px;"><span class="mark small">教</span><h3>是否顺手记一笔？</h3></div>
+          <p class="muted" style="font-size:14px;margin:4px 0 0 42px;">点一下，课后可回看。</p>
+          <div class="record-options" id="recordOptions"></div>
+          <p id="recordReply" class="tag ok hidden" style="margin-top:14px;">已记下，课后可回看。</p>
+        </div>
+        <p class="muted" style="font-size:12px;margin-top:28px;text-align:center;"></p>
+      </div>
+    </section>
+  </main>
+
+  <div id="intentScrim" class="intent-scrim hidden" onclick="resetIntent()"></div>
+  <div class="intent-wrap hidden" id="intentShell">
+    <div class="intent-inner">
+      <div id="intentPop"></div>
+      <button id="intentCollapsed" class="intent-collapsed" onclick="openIntent()">
+        <span><span class="mark tiny">教</span> 对小教说一句…</span>
+        <span style="font-size:12px;">《色彩的感觉》</span>
+      </button>
+      <div id="intentOpen" class="intent-open hidden">
+        <div class="intent-top">
+          <span>正在这节课 <b style="color:#b45309;">《色彩的感觉》</b> 上说话</span>
+          <button class="back" onclick="resetIntent()">收起</button>
+        </div>
+        <div class="intent-line">
+          <input id="intentInput" placeholder="比如：探究短一点 / 学习单简单些 / 重新设计这节课" onkeydown="if(event.key==='Enter')submitIntent()" />
+          <button class="send" onclick="submitIntent()">↑</button>
+        </div>
+        <div class="quick">
+          <button onclick="chooseIntent('探究短一点')">探究短一点</button>
+          <button onclick="chooseIntent('学习单简单些')">学习单简单些</button>
+          <button onclick="chooseIntent('重新设计这节课')">重新设计这节课</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const pages = ["entry","focus","semantic","candidate","gate"];
+    const state = {
+      current: "entry",
+      segments: [
+        { name: "导入", min: 5 },
+        { name: "探究", min: 25, focus: true },
+        { name: "展示", min: 8 },
+        { name: "总结", min: 2 }
+      ],
+      adjusted: false,
+      redesigned: false,
+      draftConfirmed: false,
+      purpose: "课堂练习型",
+      difficulty: "正常",
+      handout: "未生成",
+      deferred: false,
+      worksheetEasy: false,
+      worksheetDemo: false,
+      teacher_review_required: false,
+      formal_apply_performed: false,
+      pendingComplexAction: null,
+      process_record_candidate: null,
+      intent_bar_state: "collapsed",
+      events: []
+    };
+    const PREVIEW_STORE_KEYS_1009 = {
+      work_state: "xiaojiao.preview.work_state",
+      work_objects: "xiaojiao.preview.work_objects",
+      event_log: "xiaojiao.preview.event_log",
+      work_object_patches: "xiaojiao.preview.work_object_patches",
+      teacher_review_gates: "xiaojiao.preview.teacher_review_gates",
+      store_version: "xiaojiao.preview.store_version"
+    };
+    const PREVIEW_STORE_VERSION_1009 = "1009F-preview-sandbox-v1";
+    const BACKEND_SANDBOX_ENDPOINTS_1009 = {
+      load: "/api/xiaojiao-preview/store/load",
+      save: "/api/xiaojiao-preview/store/save",
+      appendEvent: "/api/xiaojiao-preview/event/append",
+      exportSnapshot: "/api/xiaojiao-preview/snapshot/export",
+      reset: "/api/xiaojiao-preview/store/reset"
+    };
+    const PROVIDER_COST_GATE_1009M = {
+      pricing_verified: false,
+      cost_gate_incomplete: true,
+      estimated_cost_cny: null,
+      reason: "provider pricing table not configured",
+      next_cost_action: "USER_PROVIDER_PRICING_REQUIRED",
+      batch_generation_allowed: false,
+      background_generation_allowed: false,
+      default_route_auto_provider_call_allowed: false,
+      teacher_explicit_trigger_required: true,
+      allowlist: ["generate_handout_candidate", "shorten_second_activity_candidate"]
+    };
+    let storeMode1009 = "local_fallback";
+    function setStoreMode1009(mode) {
+      storeMode1009 = mode === "backend_sandbox" ? "backend_sandbox" : "local_fallback";
+      document.body.dataset.storeMode = storeMode1009;
+      const badge = document.getElementById("storeModeBadge");
+      if (badge) badge.textContent = storeMode1009 === "backend_sandbox" ? "backend sandbox" : "local fallback";
+      try { localStorage.setItem("xiaojiao.preview.store_mode", storeMode1009); } catch (error) {}
+    }
+    function updateCostGateBadge1009() {
+      const badge = document.getElementById("costGateBadge");
+      if (!badge) return;
+      badge.textContent = PROVIDER_COST_GATE_1009M.pricing_verified && PROVIDER_COST_GATE_1009M.estimated_cost_cny !== null
+        ? "单次约 ¥" + PROVIDER_COST_GATE_1009M.estimated_cost_cny
+        : "成本待配置";
+      badge.title = PROVIDER_COST_GATE_1009M.next_cost_action;
+    }
+    function estimatePreviewProviderCost1009(action, inputTokens = 0, outputTokens = 0) {
+      const allowed = PROVIDER_COST_GATE_1009M.allowlist.includes(action);
+      const event = {
+        action,
+        input_tokens: inputTokens,
+        output_tokens: outputTokens,
+        allowed,
+        pricing_verified: PROVIDER_COST_GATE_1009M.pricing_verified,
+        estimated_cost_cny: PROVIDER_COST_GATE_1009M.estimated_cost_cny,
+        cost_gate_incomplete: PROVIDER_COST_GATE_1009M.cost_gate_incomplete,
+        batch_generation_allowed: false,
+        background_generation_allowed: false,
+        default_route_auto_provider_call_allowed: false,
+        teacher_explicit_trigger_required: true,
+        created_at: new Date().toISOString()
+      };
+      const events = readStoreValue("xiaojiao.preview.provider_cost_events", []);
+      writeStoreValue("xiaojiao.preview.provider_cost_events", events.concat(event).slice(-100));
+      mirrorBackendSave1009("provider_cost_event", event);
+      updateCostGateBadge1009();
+      return event;
+    }
+    async function backendSandboxRequest1009(endpoint, payload) {
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...payload,
+            preview_route_only: true,
+            production_store_enabled: false,
+            formal_apply_performed: false
+          })
+        });
+        if (!response.ok) throw new Error("backend_sandbox_unavailable");
+        setStoreMode1009("backend_sandbox");
+        return await response.json();
+      } catch (error) {
+        setStoreMode1009("local_fallback");
+        return null;
+      }
+    }
+    function mirrorBackendSave1009(kind, payload) {
+      const endpoint = kind === "event" ? BACKEND_SANDBOX_ENDPOINTS_1009.appendEvent : BACKEND_SANDBOX_ENDPOINTS_1009.save;
+      backendSandboxRequest1009(endpoint, { kind, payload });
+    }
+    function setTheme(theme) {
+      const safeTheme = ["minimax", "calm", "compact"].includes(theme) ? theme : "minimax";
+      document.body.dataset.theme = safeTheme;
+      document.querySelectorAll("[data-theme-button]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.themeButton === safeTheme);
+      });
+      try { localStorage.setItem("xiaojiao_1007k_theme", safeTheme); } catch (error) {}
+      log("style_theme_changed:" + safeTheme);
+    }
+    const simpleIntents = ["探究短一点","学习单简单些","多一点示范"];
+    const complexPattern = /重新|换个|换一个|整体|重做|全部|重新设计|换方向|换个方向|大改/;
+    function log(type) {
+      const event = { type, surface: state.current, teacher_review_required: state.teacher_review_required, formal_apply_performed: false, time: new Date().toISOString() };
+      state.events.push(event);
+      appendEvent(type, {
+        work_state_id: "work_state_art_teacher_today_1009",
+        work_object_id: state.current === "entry" ? "today_priority" : "lesson_design_L003",
+        summary: type,
+        teacher_review_required: state.teacher_review_required
+      });
+      persistPreviewState(type);
+    }
+    function previewStateSnapshot(lastEventType) {
+      return {
+        current_surface: state.current,
+        lesson_draft_status: state.draftConfirmed ? "confirmed" : "pending_confirmation",
+        inquiry_section_minutes: (state.segments.find(s => s.name.indexOf("探究") >= 0) || {}).min || null,
+        display_section_minutes: (state.segments.find(s => s.name.indexOf("展示") >= 0 || s.name.indexOf("分享") >= 0) || {}).min || null,
+        handout_candidate_status: state.handout,
+        teacher_review_required: state.teacher_review_required,
+        provider_candidate_source: state.providerCandidateSource,
+        provider_sandbox_mode: state.providerSandboxMode,
+        provider_sandbox_trace: state.providerSandboxTrace,
+        section_patch_candidate: state.sectionPatchCandidate,
+        process_note_candidate: state.process_record_candidate,
+        intent_bar_phase: state.intent_bar_state,
+        event_log: state.events.slice(-50),
+        last_event_type: lastEventType || null,
+        formal_apply_performed: false,
+        preview_route_only: true
+      };
+    }
+    function persistPreviewState(lastEventType) {
+      try {
+        localStorage.setItem("xiaojiao_preview_state_1010D", JSON.stringify(previewStateSnapshot(lastEventType)));
+        localStorage.setItem("xiaojiao_preview_event_log_1010D", JSON.stringify(state.events.slice(-50)));
+      } catch (error) {}
+    }
+    window.XIAOJIAO_PREVIEW_ROUTE_1010 = {
+      route: "frontend/xiaojiao-preview.html",
+      source_baseline: "1007O_R1",
+      default_route_changed: false,
+      provider_called: false,
+      model_called: false,
+      provider_sandbox_entered: true,
+      dry_run_fallback_used: true,
+      formal_apply_performed: false,
+      getState: () => previewStateSnapshot("manual_snapshot")
+    };
+
+
+    const PROVIDER_SANDBOX_GATE_1008B = {
+      provider_sandbox_allowed: true,
+      action_allowlist: ["generate_handout_candidate", "shorten_second_activity_candidate"],
+      formal_apply_allowed: false,
+      teacher_review_required: true,
+      default_route_switch_allowed: false
+    };
+    function providerSandboxAllowed(action) {
+      return PROVIDER_SANDBOX_GATE_1008B.action_allowlist.includes(action);
+    }
+    function dryRunProviderCandidate(action) {
+      if (!providerSandboxAllowed(action)) {
+        return { rejected: true, reason: "REJECT:provider_action_not_allowlisted", action };
+      }
+      if (action === "shorten_second_activity_candidate") {
+        return {
+          mode: "dry-run fallback",
+          provider_called: false,
+          model_called: false,
+          reason: "missing_sandbox_api_key",
+          normalized_candidate: {
+            candidate_type: "lesson_section_patch",
+            target_section: "探究",
+            before_minutes: 25,
+            after_minutes: 18,
+            patch_summary: "把第二环节压成观察、归纳、快速表达三步，给展示保留 15 分钟。"
+          },
+          work_object_patch: {
+            patch_id: "patch_lesson_section_patch_candidate_1008E",
+            patch_type: "lesson_section_patch_candidate",
+            target_work_object_id: "lesson_design_L003",
+            source: "dry_run_fixture",
+            teacher_review_required: true,
+            formal_apply_performed: false
+          }
+        };
+      }
+      return {
+        mode: "dry-run fallback",
+        provider_called: false,
+        model_called: false,
+        reason: "missing_sandbox_api_key",
+        normalized_candidate: {
+          candidate_type: "handout",
+          title: "《色彩的感觉》学习单",
+          grade: "四年级",
+          sections: ["看一看", "想一想", "试一试"]
+        },
+        work_object_patch: {
+          patch_id: "patch_handout_candidate_1008D",
+          patch_type: "handout_candidate",
+          target_work_object_id: "handout_L003",
+          source: "dry_run_fixture",
+          teacher_review_required: true,
+          formal_apply_performed: false
+        }
+      };
+    }
+    function bindProviderSandboxCandidate(action) {
+      const result = dryRunProviderCandidate(action);
+      if (result.rejected) {
+        flashCandidate(result.reason);
+        return result;
+      }
+      state.providerCandidateSource = result.work_object_patch.source === "provider_sandbox" ? "sandbox provider candidate" : "live sandbox provider candidate";
+      state.providerSandboxMode = result.mode;
+      state.providerSandboxTrace = result;
+      if (action === "shorten_second_activity_candidate") state.sectionPatchCandidate = result.work_object_patch;
+      mockWorkState.provider_candidate_source = state.providerCandidateSource;
+      mockWorkState.provider_sandbox_mode = state.providerSandboxMode;
+      mockWorkState.provider_sandbox_trace = result;
+      mockWorkState.teacher_review_required = true;
+      localStorage.setItem("xiaojiao_provider_sandbox_trace_1008G", JSON.stringify(result));
+      const source = document.getElementById("candidateSourceChip");
+      if (source) source.textContent = state.providerCandidateSource;
+      const trace = document.getElementById("providerSandboxTrace");
+      if (trace) trace.textContent = "provider sandbox: " + result.mode + " · " + result.work_object_patch.patch_type + " · teacher_review_required";
+      return result;
+    }
+
+    const SURFACE_TO_PAGE = {
+      light_entry: "entry",
+      focus_surface: "focus",
+      semantic_confirmation: "semantic",
+      handout_candidate_preview: "candidate",
+      teacher_review_gate: "gate"
+    };
+    const PAGE_TO_SURFACE = {
+      entry: "light_entry",
+      focus: "focus_surface",
+      semantic: "semantic_confirmation",
+      candidate: "handout_candidate_preview",
+      gate: "teacher_review_gate"
+    };
+    const mockWorkState = {
+      work_state_id: "work_state_art_teacher_today_1009",
+      teacher_id: "teacher_art_001",
+      teacher_role: "小学美术教师",
+      teacher_name: "张老师",
+      subject: "美术",
+      grade: "四年级",
+      class_id: "class_grade4_1",
+      week: 3,
+      weekday: "周三",
+      today_lessons: [
+        { id: "lesson_L001", title: "线条的节奏", grade: "三年级", status: "ready" },
+        { id: "lesson_L003", title: "色彩的感觉", grade: "四年级", status: "draft_pending_confirmation" },
+        { id: "lesson_L006", title: "有趣的泥塑", grade: "五年级", status: "watching" }
+      ],
+      current_surface: "light_entry",
+      current_priority_item: "lesson_L003",
+      current_lesson: {
+        id: "lesson_L003",
+        title: "色彩的感觉",
+        grade: "四年级 1 班",
+        section_count: 4
+      },
+      lesson_draft_status: "pending_confirmation",
+      inquiry_section_minutes: 25,
+      display_section_minutes: 8,
+      handout_status: "not_generated",
+      handout_candidate: null,
+      teacher_review_required: false,
+      formal_apply_performed: false,
+      process_note_candidate: null,
+      intent_bar_phase: "collapsed",
+      evidence_event_candidates: [],
+      event_log: []
+    };
+    function defaultWorkObjects1009() {
+      return {
+        lesson_design_L003: {
+          work_object_id: "lesson_design_L003",
+          work_object_type: "lesson_design",
+          title: "《色彩的感觉》课时设计草稿",
+          status: state.draftConfirmed ? "confirmed" : "draft",
+          owner_teacher_id: "teacher_art_001",
+          related_lesson_id: "lesson_L003",
+          content_snapshot: { lesson_title: "色彩的感觉", segments: state.segments },
+          candidate_refs: [],
+          review_status: "none",
+          created_at: "2026-06-13T00:00:00.000Z",
+          updated_at: new Date().toISOString()
+        },
+        handout_L003: {
+          work_object_id: "handout_L003",
+          work_object_type: "handout",
+          title: "《色彩的感觉》学习单",
+          status: state.handout === "未生成" ? "draft" : "candidate",
+          owner_teacher_id: "teacher_art_001",
+          related_lesson_id: "lesson_L003",
+          content_snapshot: {},
+          candidate_refs: [],
+          review_status: state.teacher_review_required ? "pending_teacher_review" : "none",
+          created_at: "2026-06-13T00:00:00.000Z",
+          updated_at: new Date().toISOString()
+        },
+        lesson_section_L003_inquiry: {
+          work_object_id: "lesson_section_L003_inquiry",
+          work_object_type: "lesson_section",
+          title: "第二环节：探究",
+          status: state.adjusted ? "candidate" : "draft",
+          owner_teacher_id: "teacher_art_001",
+          related_lesson_id: "lesson_L003",
+          content_snapshot: { minutes: mockWorkState.inquiry_section_minutes || 25 },
+          candidate_refs: [],
+          review_status: "none",
+          created_at: "2026-06-13T00:00:00.000Z",
+          updated_at: new Date().toISOString()
+        },
+        evidence_note_L003: {
+          work_object_id: "evidence_note_L003",
+          work_object_type: "evidence_note",
+          title: "轻记录",
+          status: "draft",
+          owner_teacher_id: "teacher_art_001",
+          related_lesson_id: "lesson_L003",
+          content_snapshot: {},
+          candidate_refs: [],
+          review_status: "none",
+          created_at: "2026-06-13T00:00:00.000Z",
+          updated_at: new Date().toISOString()
+        }
+      };
+    }
+    function readStoreValue(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (error) {
+        return fallback;
+      }
+    }
+    function writeStoreValue(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value)); } catch (error) {}
+      return value;
+    }
+    function loadWorkState() {
+      const stored = readStoreValue(PREVIEW_STORE_KEYS_1009.work_state, null);
+      return stored || seedPreviewStore().work_state;
+    }
+    function saveWorkState(workState) {
+      const next = { ...workState, updated_at: new Date().toISOString(), version: (Number(workState.version) || 0) + 1, source: "preview_sandbox_store" };
+      writeStoreValue(PREVIEW_STORE_KEYS_1009.work_state, next);
+      mirrorBackendSave1009("work_state", next);
+      return next;
+    }
+    function loadWorkObjects() {
+      return readStoreValue(PREVIEW_STORE_KEYS_1009.work_objects, null) || seedPreviewStore().work_objects;
+    }
+    function saveWorkObject(workObject) {
+      const objects = loadWorkObjects();
+      objects[workObject.work_object_id] = { ...workObject, updated_at: new Date().toISOString() };
+      return writeStoreValue(PREVIEW_STORE_KEYS_1009.work_objects, objects);
+    }
+    function appendEvent(action, payload = {}) {
+      const events = readStoreValue(PREVIEW_STORE_KEYS_1009.event_log, []);
+      const event = {
+        event_id: "evt_" + Date.now() + "_" + Math.random().toString(16).slice(2, 6),
+        event_type: action,
+        actor_type: "teacher",
+        actor_id: "teacher_art_001",
+        work_state_id: payload.work_state_id || "work_state_art_teacher_today_1009",
+        work_object_id: payload.work_object_id || null,
+        action,
+        summary: payload.summary || action,
+        payload_ref: payload.payload_ref || null,
+        source: "preview_sandbox_store",
+        created_at: new Date().toISOString(),
+        privacy_level: "teacher_private",
+        teacher_review_required: Boolean(payload.teacher_review_required)
+      };
+      events.push(event);
+      writeStoreValue(PREVIEW_STORE_KEYS_1009.event_log, events.slice(-200));
+      mirrorBackendSave1009("event", event);
+      return event;
+    }
+    function createWorkObjectPatch(patch) {
+      const patches = readStoreValue(PREVIEW_STORE_KEYS_1009.work_object_patches, []);
+      const next = {
+        patch_id: patch.patch_id || "patch_" + Date.now(),
+        patch_type: patch.patch_type,
+        target_work_object_id: patch.target_work_object_id,
+        source: patch.source || "preview_sandbox_fixture",
+        provider_trace_ref: patch.provider_trace_ref || "1008M_redacted_fixture",
+        normalized_candidate_ref: patch.normalized_candidate_ref || patch.patch_id || "normalized_candidate_preview",
+        teacher_review_required: true,
+        formal_apply_performed: false,
+        patch_status: "pending_teacher_review",
+        created_at: new Date().toISOString(),
+        candidate: patch.candidate || patch.normalized_candidate || null
+      };
+      patches.push(next);
+      writeStoreValue(PREVIEW_STORE_KEYS_1009.work_object_patches, patches);
+      mirrorBackendSave1009("work_object_patch", next);
+      appendEvent("create_work_object_patch", { work_object_id: next.target_work_object_id, payload_ref: next.patch_id, teacher_review_required: true });
+      return next;
+    }
+    function createTeacherReviewGate(patchId, patchType = "handout_candidate") {
+      const gates = readStoreValue(PREVIEW_STORE_KEYS_1009.teacher_review_gates, []);
+      const existing = gates.find(g => g.work_object_patch_id === patchId && g.review_status === "pending");
+      if (existing) return existing;
+      const gate = {
+        review_id: "review_" + Date.now(),
+        work_object_patch_id: patchId,
+        patch_type: patchType,
+        review_status: "pending",
+        teacher_decision: null,
+        decision_options: ["confirm", "revise_then_confirm", "defer", "discard"],
+        reviewed_at: null,
+        final_apply_allowed: false,
+        formal_apply_performed: false
+      };
+      gates.push(gate);
+      writeStoreValue(PREVIEW_STORE_KEYS_1009.teacher_review_gates, gates);
+      mirrorBackendSave1009("teacher_review_gate", gate);
+      appendEvent("enter_teacher_review_gate", { payload_ref: gate.review_id, teacher_review_required: true });
+      return gate;
+    }
+    function updateTeacherReviewGate(decision) {
+      const gates = readStoreValue(PREVIEW_STORE_KEYS_1009.teacher_review_gates, []);
+      const latest = gates[gates.length - 1];
+      if (latest) {
+        latest.review_status = decision === "confirm" ? "confirmed" : decision;
+        latest.teacher_decision = decision;
+        latest.reviewed_at = new Date().toISOString();
+        latest.final_apply_allowed = false;
+        latest.formal_apply_performed = false;
+        writeStoreValue(PREVIEW_STORE_KEYS_1009.teacher_review_gates, gates);
+        mirrorBackendSave1009("teacher_review_gate", latest);
+        appendEvent("teacher_" + decision, { payload_ref: latest.review_id, teacher_review_required: true });
+      }
+      return latest || null;
+    }
+    function exportPreviewStoreSnapshot() {
+      return {
+        work_state: loadWorkState(),
+        work_objects: loadWorkObjects(),
+        event_log: readStoreValue(PREVIEW_STORE_KEYS_1009.event_log, []),
+        work_object_patches: readStoreValue(PREVIEW_STORE_KEYS_1009.work_object_patches, []),
+        teacher_review_gates: readStoreValue(PREVIEW_STORE_KEYS_1009.teacher_review_gates, []),
+        boundary: {
+          preview_route_only: true,
+          sandbox_store_written: true,
+          real_database_written: false,
+          memory_written: false,
+          Feishu_written: false,
+          formal_apply_performed: false,
+          default_route_changed: false,
+          cost_gate_incomplete: true
+        }
+      };
+    }
+    function resetPreviewStore() {
+      Object.values(PREVIEW_STORE_KEYS_1009).forEach(key => {
+        try { localStorage.removeItem(key); } catch (error) {}
+      });
+      seedPreviewStore();
+      backendSandboxRequest1009(BACKEND_SANDBOX_ENDPOINTS_1009.reset, { action: "reset_preview_store" });
+      location.reload();
+    }
+    function seedPreviewStore() {
+      const work_state = {
+        ...mockWorkState,
+        updated_at: new Date().toISOString(),
+        version: 1,
+        source: "preview_sandbox_seed"
+      };
+      const work_objects = defaultWorkObjects1009();
+      writeStoreValue(PREVIEW_STORE_KEYS_1009.store_version, PREVIEW_STORE_VERSION_1009);
+      writeStoreValue(PREVIEW_STORE_KEYS_1009.work_state, work_state);
+      writeStoreValue(PREVIEW_STORE_KEYS_1009.work_objects, work_objects);
+      writeStoreValue(PREVIEW_STORE_KEYS_1009.event_log, []);
+      writeStoreValue(PREVIEW_STORE_KEYS_1009.work_object_patches, []);
+      writeStoreValue(PREVIEW_STORE_KEYS_1009.teacher_review_gates, []);
+      return { work_state, work_objects };
+    }
+    function ensurePreviewStore() {
+      if (!readStoreValue(PREVIEW_STORE_KEYS_1009.work_state, null)) {
+        seedPreviewStore();
+        appendEvent("open_preview", { summary: "seed preview sandbox store", teacher_review_required: false });
+      }
+      Object.assign(mockWorkState, loadWorkState());
+    }
+    function syncLegacyToStore(action) {
+      updateMockWorkStateFromLegacyState(action);
+      saveWorkState(mockWorkState);
+      return loadWorkState();
+    }
+    window.XIAOJIAO_PREVIEW_STORE_1009 = {
+      namespace: "xiaojiao.preview",
+      preview_route_only: true,
+      storeMode: () => storeMode1009,
+      backend_sandbox_store_enabled: true,
+      local_fallback_available: true,
+      sandbox_store_written: true,
+      cost_gate: PROVIDER_COST_GATE_1009M,
+      estimateProviderCost: estimatePreviewProviderCost1009,
+      real_database_written: false,
+      real_persistence_enabled: false,
+      loadWorkState,
+      saveWorkState,
+      loadWorkObjects,
+      saveWorkObject,
+      appendEvent,
+      createWorkObjectPatch,
+      createTeacherReviewGate,
+      updateTeacherReviewGate,
+      resetPreviewStore,
+      exportPreviewStoreSnapshot
+    };
+    let renderDirective = null;
+    function buildSupportingObjects(workState) {
+      return [
+        { id: "handout_L003", type: "handout", title: "学习单", status: workState.handout_status },
+        { id: "rubric_L003", type: "rubric", title: "评价量规", status: "later" },
+        { id: "resources_L003", type: "resource_reference", title: "资源参考", status: "later" }
+      ];
+    }
+    function mockComposer(workState, action) {
+      const surface = workState.current_surface || "light_entry";
+      const primaryObject = surface === "light_entry"
+        ? { id: "today_priority", type: "today_work_item", title: "今天 3 节课，1 项待你确认" }
+        : surface === "handout_candidate_preview" || surface === "teacher_review_gate"
+          ? (workState.handout_candidate || { id: "handout_candidate_L003", type: "handout_candidate", title: "《色彩的感觉》学习单" })
+          : { id: "lesson_L003", type: "lesson_design", title: "《色彩的感觉》" };
+      return {
+        directive_id: "directive_" + surface + "_" + Date.now(),
+        source: "mock_composer_1010H",
+        surface_mode: surface,
+        primary_object: primaryObject,
+        supporting_objects: buildSupportingObjects(workState),
+        visible_zones: surface === "light_entry" ? ["today_priority", "agent_note", "primary_actions"] : ["primary_object", "supporting_objects", "intent_bar"],
+        hidden_zones: surface === "light_entry" ? ["resource_library_home", "grid_studio", "right_ai_panel"] : ["resource_library_home", "right_ai_panel"],
+        agent_notes: [
+          {
+            id: "note_section_2_time",
+            attach_to: surface === "light_entry" ? "today_priority" : "lesson_structure.section_2",
+            text: workState.inquiry_section_minutes > 20 ? "探究 25 分钟偏长。我可以压到 18 分钟，把时间留给展示。" : "探究时间已调整。"
+          }
+        ],
+        available_actions: [
+          { id: "open_lesson_focus", label: "现在处理", target_surface: "focus_surface" },
+          { id: "generate_handout_candidate", label: "出一版候选", target_surface: "semantic_confirmation" },
+          { id: "enter_teacher_review", label: "进入确认", target_surface: "teacher_review_gate" }
+        ],
+        intent_bar_policy: {
+          enabled: surface !== "light_entry" && surface !== "semantic_confirmation",
+          phase: workState.intent_bar_phase,
+          quick_intents: ["探究短一点", "学习单简单些", "重新设计这节课"]
+        },
+        teacher_review_required: workState.teacher_review_required,
+        formal_apply_performed: false,
+        action
+      };
+    }
+    function applyRenderDirective(directive) {
+      renderDirective = directive;
+      window.XIAOJIAO_LAST_RENDER_DIRECTIVE_1010 = directive;
+      const page = SURFACE_TO_PAGE[directive.surface_mode] || "entry";
+      pages.forEach(p => document.getElementById(p).classList.toggle("hidden", p !== page));
+      state.current = page;
+      if (page === "focus") renderFocus();
+      if (page === "candidate") renderCandidate();
+      document.getElementById("intentShell").classList.toggle("hidden", !directive.intent_bar_policy.enabled);
+      if (!directive.intent_bar_policy.enabled) {
+        document.body.classList.remove("intent-open");
+        document.getElementById("intentScrim").classList.add("hidden");
+      }
+      persistDirectiveState("render_surface:" + directive.surface_mode);
+    }
+    function refreshRenderDirective(action) {
+      const storeState = syncLegacyToStore(action || "refresh");
+      renderDirective = mockComposer(storeState, action || "refresh");
+      applyRenderDirective(renderDirective);
+      return renderDirective;
+    }
+    function updateMockWorkStateFromLegacyState(action) {
+      mockWorkState.current_surface = PAGE_TO_SURFACE[state.current] || mockWorkState.current_surface;
+      mockWorkState.lesson_draft_status = state.draftConfirmed ? "confirmed" : "pending_confirmation";
+      mockWorkState.inquiry_section_minutes = (state.segments.find(s => s.name.indexOf("探究") >= 0) || {}).min || mockWorkState.inquiry_section_minutes;
+      mockWorkState.display_section_minutes = (state.segments.find(s => s.name.indexOf("展示") >= 0 || s.name.indexOf("分享") >= 0) || {}).min || mockWorkState.display_section_minutes;
+      mockWorkState.handout_status = state.handout === "未生成" ? "not_generated" : "candidate_pending_review";
+      mockWorkState.teacher_review_required = state.teacher_review_required;
+      mockWorkState.formal_apply_performed = false;
+      mockWorkState.process_note_candidate = state.process_record_candidate;
+      mockWorkState.intent_bar_phase = state.intent_bar_state;
+      mockWorkState.event_log = state.events.slice(-50);
+      mockWorkState.last_action = action || null;
+    }
+    function dispatchMockAction(action, patch = {}) {
+      Object.assign(mockWorkState, patch);
+      mockWorkState.event_log.push({
+        type: action,
+        surface: mockWorkState.current_surface,
+        formal_apply_performed: false,
+        time: new Date().toISOString()
+      });
+      return refreshRenderDirective(action);
+    }
+    function persistDirectiveState(lastEventType) {
+      try {
+        saveWorkState(mockWorkState);
+        localStorage.setItem("xiaojiao_mock_work_state_1010H", JSON.stringify(mockWorkState));
+        localStorage.setItem("xiaojiao_render_directive_1010I", JSON.stringify(renderDirective || mockComposer(mockWorkState, "persist")));
+        localStorage.setItem("xiaojiao_render_directive_event_log_1010J", JSON.stringify(mockWorkState.event_log.slice(-50)));
+      } catch (error) {}
+    }
+
+    function go(id) {
+      state.current = id;
+      mockWorkState.current_surface = PAGE_TO_SURFACE[id] || "light_entry";
+      if (id === "focus") appendEvent("open_lesson_focus", { work_object_id: "lesson_design_L003", summary: "打开单课焦点工作面" });
+      if (id === "candidate") {
+        mockWorkState.handout_status = "candidate_pending_review";
+        mockWorkState.handout_candidate = mockWorkState.handout_candidate || { id: "handout_candidate_L003", type: "handout_candidate", title: "《色彩的感觉》学习单", status: "candidate_pending_review" };
+      }
+      if (id === "gate") {
+        mockWorkState.teacher_review_required = true;
+        const patches = readStoreValue(PREVIEW_STORE_KEYS_1009.work_object_patches, []);
+        const latestPatch = patches[patches.length - 1];
+        if (latestPatch) createTeacherReviewGate(latestPatch.patch_id, latestPatch.patch_type);
+      }
+      refreshRenderDirective("surface_" + id);
+      log("surface_" + id);
+    }
+    function deferToday() {
+      state.deferred = true;
+      document.getElementById("deferReply").classList.remove("hidden");
+      document.getElementById("entryLeadCard").style.opacity = ".72";
+      document.getElementById("entryActions").innerHTML = `<button class="btn" onclick="go('focus')">还是处理一下</button>`;
+      log("defer_current_item");
+    }
+    function renderFocus() {
+      const bar = document.getElementById("timebar");
+      bar.innerHTML = state.segments.map(s => `<span title="${s.name} · ${s.min} 分钟" class="${s.focus && !state.adjusted ? "hot" : state.adjusted && s.focus ? "done" : ""}" style="flex:${s.min}"></span>`).join("");
+      document.getElementById("timeLabels").innerHTML = state.segments.map(s => `<span>${s.name} · ${s.min} 分钟</span>`).join("");
+      const segs = document.getElementById("segments");
+      segs.innerHTML = state.segments.map((s,i) => {
+        const cls = s.focus && !state.adjusted ? "segment hot" : s.focus && state.adjusted ? "segment done" : "segment";
+        const note = s.focus && !state.adjusted ? `<div class="attached-note" id="sectionAdvice"><div class="says"><span class="mark small">教</span><div class="bubble">探究 25 分钟偏长。我可以压到 18 分钟，把时间留给展示。</div></div><div class="btns" style="margin-left:42px;margin-top:10px;"><button class="btn primary" onclick="applyAdjust()">按这个改</button><button class="btn ghost" onclick="dismissAdvice()">先放着</button></div></div>` : "";
+        const done = s.focus && state.adjusted && !state.redesigned ? `<p class="tag ok" style="margin:9px 0 0 14px;">已调成：探究 18 分钟，展示 15 分钟。</p>` : "";
+        return `<div><div class="${cls}"><span>${i+1}. ${s.name}</span><span>${s.min} 分钟</span></div>${note}${done}</div>`;
+      }).join("");
+      document.getElementById("redesignTag").classList.toggle("hidden", !state.redesigned);
+      document.getElementById("draftTag").textContent = state.draftConfirmed ? "课时草稿 · 已确认" : "课时设计草稿 · 待确认";
+      document.getElementById("draftTag").className = state.draftConfirmed ? "tag ok" : "tag";
+      document.getElementById("confirmDraftBtn").textContent = state.draftConfirmed ? "✓ 课时草稿已确认" : "确认课时草稿";
+      document.getElementById("handoutStatus").textContent = state.handout;
+      document.getElementById("handoutCard").classList.toggle("active", state.handout !== "未生成");
+      document.getElementById("stepDraft").className = state.draftConfirmed ? "tag ok" : "tag";
+      document.getElementById("stepHandout").className = state.handout !== "未生成" ? "tag ok" : "tag gray";
+      document.getElementById("stepReview").className = state.teacher_review_required ? "tag ok" : "tag gray";
+      document.getElementById("progressText").textContent = "已看草稿" + (state.adjusted ? (state.redesigned ? " · 已重排" : " · 已调时间") : "") + (state.draftConfirmed ? " · 已确认" : "");
+    }
+    function dismissAdvice() {
+      const advice = document.getElementById("sectionAdvice");
+      if (advice) advice.innerHTML = '<p class="muted" style="font-size:12px;margin:8px 0 0 42px;">好，先放着。</p>';
+      log("dismiss_section_advice");
+    }
+    function applyAdjust() {
+      state.segments = state.segments.map(s => s.name === "探究" ? { ...s, min: 18, focus: true } : s.name === "展示" ? { ...s, min: 15 } : s);
+      state.adjusted = true;
+      mockWorkState.current_surface = "focus_surface";
+      mockWorkState.inquiry_section_minutes = 18;
+      mockWorkState.display_section_minutes = 15;
+      bindProviderSandboxCandidate("shorten_second_activity_candidate");
+      createWorkObjectPatch({
+        patch_id: "patch_second_activity_preview_store_1009E",
+        patch_type: "lesson_section_patch_candidate",
+        target_work_object_id: "lesson_design_L003",
+        source: "preview_sandbox_fixture",
+        normalized_candidate_ref: "normalized_second_activity_patch_hardened_1008M",
+        normalized_candidate: {
+          candidate_type: "lesson_section_patch",
+          target_section: "探究",
+          before_minutes: 25,
+          after_minutes: 18,
+          candidate_only: true,
+          teacher_review_required: true,
+          formal_apply_performed: false
+        }
+      });
+      refreshRenderDirective("shorten_inquiry");
+      log("intent_bar_simple_action:探究短一点");
+    }
+    function confirmDraft() {
+      state.draftConfirmed = true;
+      mockWorkState.lesson_draft_status = "confirmed";
+      refreshRenderDirective("confirm_lesson_draft");
+      log("confirm_lesson_draft");
+    }
+    function renderChoices() {
+      const purposes = ["课堂练习型","观察记录型","创作提示型"];
+      const diffs = ["简单一点","正常","有挑战"];
+      document.getElementById("purposeChoices").innerHTML = purposes.map(v => `<button class="choice ${state.purpose===v?"active":""}" onclick="state.purpose='${v}';renderChoices()">${v}</button>`).join("");
+      document.getElementById("difficultyChoices").innerHTML = diffs.map(v => `<button class="choice ${state.difficulty===v?"active":""}" onclick="state.difficulty='${v}';renderChoices()">${v}</button>`).join("");
+    }
+    function makeCandidate() {
+      state.handout = "候选待确认";
+      estimatePreviewProviderCost1009("generate_handout_candidate", 720, 600);
+      const sandboxCandidate = bindProviderSandboxCandidate("generate_handout_candidate");
+      mockWorkState.handout_status = "candidate_pending_review";
+      mockWorkState.handout_candidate = { id: "handout_candidate_L003", type: "handout_candidate", title: "《色彩的感觉》学习单", status: "candidate_pending_review", source: sandboxCandidate.work_object_patch.source, patch_id: sandboxCandidate.work_object_patch.patch_id };
+      createWorkObjectPatch({
+        patch_id: "patch_handout_candidate_preview_store_1009E",
+        patch_type: "handout_candidate",
+        target_work_object_id: "handout_L003",
+        source: "preview_sandbox_fixture",
+        normalized_candidate_ref: "normalized_handout_candidate_hardened_1008M",
+        normalized_candidate: {
+          candidate_type: "handout",
+          title: "《色彩的感觉》学习单",
+          grade: "四年级",
+          candidate_only: true,
+          teacher_review_required: true,
+          formal_apply_performed: false
+        }
+      });
+      mockWorkState.current_surface = "semantic_confirmation";
+      refreshRenderDirective("generate_handout_candidate");
+      showGenerationThinking();
+      setTimeout(() => { go("candidate"); resetIntent(); }, 950);
+    }
+    function showGenerationThinking() {
+      document.getElementById("intentShell").classList.remove("hidden");
+      document.getElementById("intentCollapsed").classList.add("hidden");
+      document.getElementById("intentOpen").classList.add("hidden");
+      document.getElementById("intentPop").innerHTML = `<div class="intent-pop"><span class="mark thinking-mark">教</span><div class="intent-card"><span class="muted" style="font-size:14px;">小教在整理</span><span class="dots"><span></span><span></span><span></span></span></div></div>`;
+      log("generate_candidate_thinking");
+    }
+    function renderCandidate() {
+      document.getElementById("candidateDifficulty").textContent = state.difficulty;
+      document.getElementById("demoBlock").classList.toggle("hidden", !state.worksheetDemo);
+      document.getElementById("task1").textContent = state.worksheetEasy ? "圈出图片中的冷色和暖色（图上已经先帮你标好两个例子）" : "圈出图片中的冷色和暖色";
+      document.getElementById("task2").textContent = state.worksheetEasy ? "从给出的词语里挑 3 个，描述这张图给你的感觉" : "用 3 个词描述这张图给你的感觉";
+      const tags = ["来自本节课教学目标","来自当前课时结构","适合四年级学生", state.worksheetEasy && "已按你的话调简单", state.worksheetDemo && "已按你的话加示范", "未正式采用"].filter(Boolean);
+      document.getElementById("sourceTags").innerHTML = `依据：本课目标、课时结构、四年级学情`;
+    }
+    function flashCandidate(t) {
+      const el = document.getElementById("candidateFlash");
+      el.textContent = t;
+      el.classList.remove("hidden");
+    }
+    function setFinal(type) {
+      state.teacher_review_required = true;
+      mockWorkState.teacher_review_required = true;
+      mockWorkState.current_surface = "teacher_review_gate";
+      const decisionMap = { adopted: "confirm", adopted_edit: "revise_then_confirm", saved: "defer", dropped: "discard" };
+      updateTeacherReviewGate(decisionMap[type] || "defer");
+      refreshRenderDirective("teacher_review_gate_decision_preview:" + type);
+      document.getElementById("reviewOpen").classList.add("hidden");
+      document.getElementById("reviewDone").classList.remove("hidden");
+      const titles = { adopted:"已采用", adopted_edit:"已采用（含你的修改）", saved:"已暂存", dropped:"已放弃这份候选稿" };
+      const texts = { adopted:"已确认，但当前仍为 preview sandbox，不写正式材料。", adopted_edit:"你的修改已记录，但当前仍为 preview sandbox，不写正式材料。", saved:"先放在本课 preview sandbox 里，随时可以接着弄。", dropped:"需要时可以重新出一版，本课正式材料不受影响。" };
+      document.getElementById("finalTitle").textContent = titles[type];
+      document.getElementById("finalText").textContent = texts[type];
+      log("teacher_review_gate_decision_preview:" + type);
+    }
+    function renderRecordOptions() {
+      const opts = ["学生需要更多示范","创作时间要留足","难度合适","下节再看"];
+      document.getElementById("recordOptions").innerHTML = opts.map(o => `<button class="btn" onclick="recordNote('${o}', this)">${o}</button>`).join("");
+    }
+    function recordNote(o, btn) {
+      state.process_record_candidate = o;
+      mockWorkState.process_note_candidate = o;
+      mockWorkState.evidence_event_candidates.push({ type: "process_note_candidate", value: o, work_object: "lesson_L003", formal_apply_performed: false });
+      appendEvent("add_light_record_tag", { work_object_id: "evidence_note_L003", summary: o, teacher_review_required: false });
+      refreshRenderDirective("evidence_event_candidate:" + o);
+      document.querySelectorAll("#recordOptions button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("recordReply").classList.toggle("hidden", o === "不记录");
+      log("quick_mark_recorded");
+    }
+    function openIntent() {
+      state.intent_bar_state = "input";
+      mockWorkState.intent_bar_phase = "input";
+      document.body.classList.add("intent-open");
+      document.getElementById("intentScrim").classList.remove("hidden");
+      document.getElementById("intentCollapsed").classList.add("hidden");
+      document.getElementById("intentOpen").classList.remove("hidden");
+      setTimeout(() => document.getElementById("intentInput").focus(), 0);
+    }
+    function resetIntent() {
+      state.intent_bar_state = "collapsed";
+      mockWorkState.intent_bar_phase = "collapsed";
+      document.body.classList.remove("intent-open");
+      document.getElementById("intentScrim").classList.add("hidden");
+      document.getElementById("intentCollapsed").classList.remove("hidden");
+      document.getElementById("intentOpen").classList.add("hidden");
+      document.getElementById("intentPop").innerHTML = "";
+      document.getElementById("intentOpen").style.opacity = "1";
+      document.getElementById("intentInput").value = "";
+    }
+    function chooseIntent(v) {
+      document.getElementById("intentInput").value = v;
+    }
+    function parseIntent(t) {
+      if (/探究/.test(t) && /(短|压|减)/.test(t)) return { complex:false, understand:"探究短一点，把时间留给展示。", action:"shorten_inquiry" };
+      if (/(简单|容易|降低难度)/.test(t)) return { complex:false, understand:"学习单简单一点。", action:"easier" };
+      if (/(示范|举例|多一点例子)/.test(t)) return { complex:false, understand:"学习单里多加一点示范。", action:"more_demo" };
+      if (complexPattern.test(t)) return { complex:true, understand:"重排这节课，让它更围绕“先感受、再表达”展开。", action:"redesign" };
+      return { complex:true, understand:`按你说的“${t}”来调整当前这节课的内容。`, action:"generic" };
+    }
+    function submitIntent() {
+      const input = document.getElementById("intentInput");
+      const t = input.value.trim();
+      if (!t) return;
+      const r = parseIntent(t);
+      if (!r.complex) {
+        applyIntentAction(r.action);
+        showDone(r.understand);
+        setTimeout(resetIntent, 1800);
+      } else {
+        state.pendingComplexAction = r;
+        state.intent_bar_state = "thinking";
+        mockWorkState.intent_bar_phase = "thinking";
+        document.getElementById("intentOpen").style.opacity = ".58";
+        document.getElementById("intentPop").innerHTML = `<div class="intent-pop"><span class="mark thinking-mark">教</span><div class="intent-card"><span class="muted" style="font-size:14px;">小教在想</span><span class="dots"><span></span><span></span><span></span></span></div></div>`;
+        log("intent_bar_complex_thinking:" + t);
+        setTimeout(() => {
+          state.intent_bar_state = "confirm";
+          mockWorkState.intent_bar_phase = "confirm";
+          const warning = r.action === "redesign" && state.draftConfirmed ? `<p class="tag" style="margin-top:10px;">这会重排整节课，并把“已确认草稿”退回待确认。</p>` : "";
+          document.getElementById("intentPop").innerHTML = `<div class="intent-pop"><span class="mark">教</span><div class="intent-card"><div class="bubble-label">你的意思是</div><p style="font-size:14px;line-height:1.7;color:#44403c;">${r.understand}</p>${warning}<div class="btns" style="margin-top:12px;"><button class="btn primary" onclick="confirmComplex()">对，去做</button><button class="btn ghost" onclick="document.getElementById('intentOpen').style.opacity='1';document.getElementById('intentPop').innerHTML='';state.intent_bar_state='input'">再说说</button></div></div></div>`;
+        }, 900);
+      }
+    }
+    function applyIntentAction(action) {
+      if (action === "shorten_inquiry") applyAdjust();
+      if (action === "easier") { state.worksheetEasy = true; state.difficulty = "简单一点"; state.handout = "候选待确认"; mockWorkState.handout_status = "candidate_pending_review"; refreshRenderDirective("easier_handout"); }
+      if (action === "more_demo") { state.worksheetDemo = true; state.handout = "候选待确认"; mockWorkState.handout_status = "candidate_pending_review"; refreshRenderDirective("more_demo"); }
+      if (action === "redesign") {
+        state.redesigned = true;
+        state.adjusted = true;
+        state.draftConfirmed = false;
+        state.segments = [
+          { name:"感受（看与说）", min:12 },
+          { name:"探究", min:10 },
+          { name:"创作表达", min:15 },
+          { name:"分享", min:3 }
+        ];
+        mockWorkState.lesson_structure = state.segments;
+        mockWorkState.lesson_draft_status = "pending_confirmation";
+        mockWorkState.current_surface = "focus_surface";
+        refreshRenderDirective("redesign_lesson");
+      }
+      log("intent_action:" + action);
+    }
+    function confirmComplex() {
+      const pending = state.pendingComplexAction;
+      if (!pending) return;
+      document.getElementById("intentOpen").style.opacity = "1";
+      applyIntentAction(pending.action);
+      showDone(pending.understand);
+      state.pendingComplexAction = null;
+      setTimeout(resetIntent, 1800);
+    }
+    function showDone(text) {
+      state.intent_bar_state = "done";
+      mockWorkState.intent_bar_phase = "done";
+      document.getElementById("intentPop").innerHTML = `<div class="done-pop"><div class="done-icon">✓</div><div class="done-text">已调整</div></div>`;
+      log("intent_bar_done");
+    }
+    ensurePreviewStore();
+    renderChoices();
+    renderRecordOptions();
+    setTheme((() => {
+      try { return localStorage.getItem("xiaojiao_1007k_theme") || "minimax"; }
+      catch (error) { return "minimax"; }
+    })());
+    updateCostGateBadge1009();
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        if (state.current === "semantic") go("focus");
+        else resetIntent();
+      }
+    });
+    refreshRenderDirective("open_workbench");
+    log("open_workbench");
+    persistPreviewState("open_workbench");
+  </script>
+</body>
+</html>
+
+<!-- 1007O_R1 product_experience_denoise_polish preview-only: teacher_review_required formal_apply_performed=false provider_called=false model_called=false database_written=false memory_written=false Feishu_written=false frontend_runtime_modified=false -->
+
+<!-- 1007O_R1 denoise preview-only: teacher_review_required formal_apply_performed=false provider_called=false model_called=false database_written=false memory_written=false Feishu_written=false frontend_runtime_modified=false -->
+
+<!-- 1010 preview route only: default_route_changed=false old_strong_agent_page_preserved=true provider_called=false model_called=false database_written=false memory_written=false Feishu_written=false formal_apply_performed=false -->
+
+<!-- 1010I render directive refactor: mockWorkState mockComposer renderDirective renderSurface preview-only default_route_changed=false provider_called=false model_called=false formal_apply_performed=false -->
+
+<!-- 1008G provider sandbox preview binding: provider_sandbox_entered=true dry_run_fallback_used=false default_route_changed=false formal_apply_performed=false teacher_review_required=true -->
+
+<!-- 1008I live replay preview marker: live sandbox provider candidate provider_called=true model_called=true formal_apply_performed=false teacher_review_required=true -->
+
+<!-- 1009A-F preview-only sandbox store: localStorage namespace=xiaojiao.preview sandbox_store_written=true real_database_written=false real_persistence_enabled=false default_route_changed=false old_strong_agent_page_preserved=true formal_apply_performed=false cost_gate_incomplete=true -->

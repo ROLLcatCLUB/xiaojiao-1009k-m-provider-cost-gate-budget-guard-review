@@ -1,0 +1,21 @@
+{
+  "package": "xiaojiao_cost_gate_smoke_preview_binding_1009M",
+  "zip_entry_count": 11,
+  "zip_sha256": "82F3D6C8729E52BD11F09DC6A65E435AC74015B1B6402843F8A07581AD035E50",
+  "entries": [
+    "backend/xiaobei_ai/xiaojiao_preview_sandbox_store_1009H.py",
+    "docs/audit/xiaojiao_cost_gate_smoke_preview_binding_1009M_report.md",
+    "docs/audit/xiaojiao_cost_gate_smoke_preview_binding_1009M_result.json",
+    "docs/foundation/xiaojiao_cost_gate_smoke_preview_binding_1009M.json",
+    "docs/foundation/xiaojiao_cost_gate_smoke_preview_binding_1009M.md",
+    "frontend/xiaojiao-preview.html",
+    "samples/xiaojiao_cost_gate_smoke_preview_binding_1009M/budget_reject_trace_1009M.json",
+    "samples/xiaojiao_cost_gate_smoke_preview_binding_1009M/cost_gate_smoke_trace_1009M.json",
+    "samples/xiaojiao_cost_gate_smoke_preview_binding_1009M/preview_cost_status_trace_1009M.json",
+    "samples/xiaojiao_cost_gate_smoke_preview_binding_1009M/provider_cost_event_sample_1009M.json",
+    "scripts/validate_xiaojiao_cost_gate_smoke_preview_binding_1009M.py"
+  ],
+  "manifest_minus_zip": [],
+  "zip_minus_manifest": [],
+  "created_at": "2026-06-13T19:14:50.515418+00:00"
+}

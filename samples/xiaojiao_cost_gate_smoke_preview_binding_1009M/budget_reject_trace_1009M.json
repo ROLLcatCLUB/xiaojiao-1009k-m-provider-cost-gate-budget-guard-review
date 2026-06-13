@@ -1,0 +1,5 @@
+{
+  "batch_generation": "REJECT:batch_generation_not_allowed",
+  "background_generation": "REJECT:background_generation_not_allowed",
+  "default_route_auto_provider_call": "REJECT:default_route_auto_provider_call_not_allowed"
+}

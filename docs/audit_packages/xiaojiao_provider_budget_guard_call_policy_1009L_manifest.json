@@ -1,0 +1,18 @@
+{
+  "package": "xiaojiao_provider_budget_guard_call_policy_1009L",
+  "zip_entry_count": 8,
+  "zip_sha256": "253691C68A1A8BF0FFF169A65163674CF79D861BCF6460109FA9E038DE81AA11",
+  "entries": [
+    "docs/audit/xiaojiao_provider_budget_guard_call_policy_1009L_report.md",
+    "docs/audit/xiaojiao_provider_budget_guard_call_policy_1009L_result.json",
+    "docs/foundation/xiaojiao_provider_budget_guard_call_policy_1009L.json",
+    "docs/foundation/xiaojiao_provider_budget_guard_call_policy_1009L.md",
+    "samples/xiaojiao_provider_budget_guard_call_policy_1009L/provider_budget_guard_policy_1009L.json",
+    "samples/xiaojiao_provider_budget_guard_call_policy_1009L/provider_call_allowlist_1009L.json",
+    "samples/xiaojiao_provider_budget_guard_call_policy_1009L/provider_reject_samples_1009L.json",
+    "scripts/validate_xiaojiao_provider_budget_guard_call_policy_1009L.py"
+  ],
+  "manifest_minus_zip": [],
+  "zip_minus_manifest": [],
+  "created_at": "2026-06-13T19:14:50.348288+00:00"
+}

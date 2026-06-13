@@ -1,0 +1,7 @@
+{
+  "allowed_actions": [
+    "generate_handout_candidate",
+    "shorten_second_activity_candidate"
+  ],
+  "teacher_explicit_trigger_required": true
+}

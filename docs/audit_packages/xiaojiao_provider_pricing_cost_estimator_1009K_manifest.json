@@ -1,0 +1,18 @@
+{
+  "package": "xiaojiao_provider_pricing_cost_estimator_1009K",
+  "zip_entry_count": 8,
+  "zip_sha256": "32557B67C03AB002D2655B62CF9837676B54D267D4EA7F7C19D4AFF2F2C53A45",
+  "entries": [
+    "docs/audit/xiaojiao_provider_pricing_cost_estimator_1009K_report.md",
+    "docs/audit/xiaojiao_provider_pricing_cost_estimator_1009K_result.json",
+    "docs/foundation/xiaojiao_provider_pricing_cost_estimator_1009K.json",
+    "docs/foundation/xiaojiao_provider_pricing_cost_estimator_1009K.md",
+    "samples/xiaojiao_provider_pricing_cost_estimator_1009K/cost_estimator_trace_1009K.json",
+    "samples/xiaojiao_provider_pricing_cost_estimator_1009K/provider_pricing_config_sample_1009K.json",
+    "samples/xiaojiao_provider_pricing_cost_estimator_1009K/provider_pricing_config_schema_1009K.json",
+    "scripts/validate_xiaojiao_provider_pricing_cost_estimator_1009K.py"
+  ],
+  "manifest_minus_zip": [],
+  "zip_minus_manifest": [],
+  "created_at": "2026-06-13T19:14:50.297682+00:00"
+}
